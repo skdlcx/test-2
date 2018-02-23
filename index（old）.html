@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>水利分析查询系统</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.23/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.23/esri/css/esri.css">
+    <!--<link rel="stylesheet" href="css/style.css">-->
+    <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+
+        }
+        #LocateButton {
+            position: fixed;
+            top: 95px;
+            left: 20px;
+            z-index: 50;
+        }
+        #layerListPane{
+            width:25%;
+        }
+        .esriLayer{
+            background-color: #fff;
+        }
+        .esriLayerList .esriList{
+            border-top:none;
+        }
+        .esriLayerList .esriTitle {
+            background-color: #fff;
+            border-bottom:none;
+        }
+        .esriLayerList .esriList ul{
+            background-color: #fff;
+        }
+
+
+    </style>
+    <script src="https://js.arcgis.com/3.23/"></script>
+    <!--<script src="js/main.js"></script>-->
+    <script>
+
+        require([
+                "esri/map",
+                "esri/layers/ArcGISDynamicMapServiceLayer",
+                "esri/dijit/OverviewMap",
+                "dojo/parser",
+                "esri/dijit/LayerList",
+                "esri/dijit/LocateButton",
+                "dijit/layout/BorderContainer",
+                "dijit/layout/ContentPane",
+                "dojo/domReady!"
+            ],
+            function(
+                Map,
+                ArcGISDynamicMapServiceLayer,
+                OverviewMap,
+                parser,
+                LayerList,
+                LocateButton
+
+            ) {
+                parser.parse();
+
+                var map= new Map("map", {
+                    basemap: "hybrid",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
+                    center: [118.4855556, 37.4563889], // longitude, latitude
+                    zoom: 11
+                });
+
+                var layer=new ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/Yihonghe/MapServer");
+
+                map.addLayer(layer) ;
+
+                dojo.connect(layer,"onLoad",loadList);
+
+                function loadList(layers) {}
+
+                var overviewMapDijit = new OverviewMap({
+                    map:map,
+                    visible: true,
+                    zoom: 20
+                });
+                overviewMapDijit.startup();
+
+                var layerList = new LayerList({
+                    map:map,
+                    showLegend:true,
+                    showSubLayers:true,
+                    showOpacitySlider:true,
+                    layers:[]
+                },"layerListDom")
+                layerList.startup();
+
+                var geoLocate = new LocateButton({
+                    map: map,
+                    highlightLocation: true
+                }, "LocateButton");
+                geoLocate.startup();
+
+            });
+    </script>
+
+</head>
+
+<body>
+<div data-dojo-type="dijit/layout/BorderContainer"
+     data-dojo-props="design:'headline', gutters:false"
+     style="width: 100%; height: 100%; margin:0;">
+
+    <div id="map"
+         data-dojo-type="dijit/layout/ContentPane"
+         data-dojo-props="region:'center'"
+         style="padding:0">
+        <div id="LocateButton"></div>
+    </div>
+
+    <div id="layerListPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'">
+
+        <div id="layerListDom"></div>
+
+    </div>
+</div>
+</body>
+</html>
